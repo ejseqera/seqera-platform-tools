@@ -46,3 +46,30 @@ You can find more info on the `seqerakit` package [here](https://github.com/seqe
 ```bash
 export TOWER_ACCESS_TOKEN=<your access token>
 ```
+
+## Running this on Seqera Platform
+
+You can run the `extract_metadata.py` script as a part of the Post-run script of your pipelines or compute environments, to generate a `workflow_metadata.json` file that will contain the workflow metadata for each run (successful or unsuccessful). By default, this will be written to the specified `outdir` parameter of the pipeline.
+
+To do this, include the following snippet in the [`Post-run script`](https://help.tower.nf/23.2/launch/advanced/#pre-and-post-run-scripts) section of your Pipeline on the Launchpad, or when configuring your compute environment:
+
+**Note**: This is currently only supported and tested for AWS.
+
+```bash
+echo "Installing dependencies..."
+yum install wget jq -y -q
+wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O m.sh && bash m.sh -b -p $HOME/miniconda3
+source "$HOME/miniconda3/etc/profile.d/conda.sh" && conda init
+
+echo "Building conda env..."
+curl -s https://raw.githubusercontent.com/ejseqera/seqera-platform-tools/main/environment.yaml > env.yaml
+conda env create -f env.yaml && conda activate seqerakit
+
+echo "Running script..."
+curl -s https://raw.githubusercontent.com/ejseqera/seqera-platform-tools/main/extract_metadata.py > script.py && chmod +x script.py
+python script.py -o workflow_metadata.json -w $TOWER_WORKSPACE_ID -id $TOWER_WORKFLOW_ID
+export OUTDIR=$(jq -r '.params.outdir' workflow_metadata.json)
+
+echo "Copying file to ${OUTDIR}..."
+aws s3 cp workflow_metadata.json ${OUTDIR}
+```
