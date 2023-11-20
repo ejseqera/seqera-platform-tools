@@ -47,9 +47,9 @@ You can find more info on the `seqerakit` package [here](https://github.com/seqe
 export TOWER_ACCESS_TOKEN=<your access token>
 ```
 
-## Running this on Seqera Platform
+## Running `extract_metadata.py` on Seqera Platform
 
-You can run the `extract_metadata.py` script as a part of the Post-run script of your pipelines or compute environments, to generate a `workflow_metadata.json` file that will contain the workflow metadata for each run (successful or unsuccessful). By default, this will be written to the specified `outdir` parameter of the pipeline.
+You can run the `extract_metadata.py` script as a part of the Post-run script of your pipelines on your Launchpad or compute environments, to generate a `workflow_metadata.json` file that will contain the workflow metadata for each run (successful or unsuccessful). By default, this will be written to the specified `outdir` parameter of the pipeline.
 
 To do this, include the following snippet in the [`Post-run script`](https://help.tower.nf/23.2/launch/advanced/#pre-and-post-run-scripts) section of your Pipeline on the Launchpad, or when configuring your compute environment:
 
@@ -71,5 +71,5 @@ python script.py -o workflow_metadata.json -w $TOWER_WORKSPACE_ID -id $TOWER_WOR
 export OUTDIR=$(jq -r '.params.outdir' workflow_metadata.json)
 
 echo "Copying file to ${OUTDIR}..."
-aws s3 cp workflow_metadata.json ${OUTDIR}
+aws s3 cp workflow_metadata.json ${OUTDIR}/
 ```
