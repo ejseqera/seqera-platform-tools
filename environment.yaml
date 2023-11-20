@@ -1,0 +1,10 @@
+name: seqerakit
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - conda-forge::python>=3.8
+  - conda-forge::pyyaml=6.0
+  - bioconda::tower-cli=0.9.0
+  - bioconda::seqerakit
